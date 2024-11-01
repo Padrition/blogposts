@@ -9,13 +9,15 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+    ports:
+      - "5432:5432"
 
   axum-app:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres/postgres
+    env_file:
+      - .env
     depends_on:
       - postgres
     ports:
