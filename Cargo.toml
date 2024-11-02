@@ -12,5 +12,6 @@ tracing-subscriber = {version = "0.3.18", features = ["env-filter"]}
 deadpool-diesel = {version = "0.6.1", features = ["postgres"]} 
 diesel = { version = "2.2.4", features = ["postgres", "chrono"] }
 diesel_migrations = "2.2.0"
+tower-http = { version = "0.6.1", features = ["cors", "fs"] }
 chrono = {version = "0.4.38", features = ["serde"]}
 dotenvy = "0.15.7"

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Post</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Blog Posts</h1>
+
+  <form id="blogPostForm">
+    <div>
+      <label for="postContent">Blog Post Content:</label>
+      <textarea id="postContent" name="postContent" rows="4" placeholder="Write your post here..." required></textarea>
+    </div>
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" placeholder="Enter your username" required>
+    </div>
+    <div>
+      <label for="postImage">Blog Post Image:</label>
+      <input type="file" id="postImage" name="postImage" accept="image/*">
+    </div>
+    <div>
+      <label for="avatarUrl">User Avatar Image URL:</label>
+      <input type="url" id="avatarUrl" name="avatarUrl" placeholder="Enter avatar image URL">
+    </div>
+    <button type="submit">Create Post</button>
+  </form>
+
+  <h2>Blog Posts</h2>
+  <div id="blogPostsContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

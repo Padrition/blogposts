@@ -1,4 +1,4 @@
-use deadpool_diesel::postgres::{Manager, Pool};
+use deadpool_diesel::postgres::Pool;
 use dotenvy::dotenv;
 use std::env;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
