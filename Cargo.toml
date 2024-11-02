@@ -9,5 +9,8 @@ axum = "0.7.7"
 serde = {version = "1.0.214", features = ["derive"]}
 tracing = "0.1"
 tracing-subscriber = {version = "0.3.18", features = ["env-filter"]}
-diesel = "2.2.4"
-diesel-async = { version = "0.5.1", features = ["postgres", "bb8"] }
+deadpool-diesel = {version = "0.6.1", features = ["postgres"]} 
+diesel = { version = "2.2.4", features = ["postgres", "chrono"] }
+diesel_migrations = "2.2.0"
+chrono = {version = "0.4.38", features = ["serde"]}
+dotenvy = "0.15.7"
