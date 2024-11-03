@@ -18,6 +18,8 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    volumes:
+      - media_data:/media
     depends_on:
       - postgres
     ports:
@@ -30,6 +32,7 @@ services:
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - media_data:/media
     networks:
       - app-network
     ports:
@@ -37,6 +40,7 @@ services:
 
 volumes:
   pgdata:
+  media_data:
 
 networks:
   app-network:

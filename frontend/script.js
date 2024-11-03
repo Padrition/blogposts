@@ -1,49 +1,44 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Fetch and render blog posts on page load
-    await fetchAndRenderPosts();
-  
-    // Handle form submission for creating new posts
-    const form = document.getElementById('blogPostForm');
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault(); // Prevent default form submission
-  
-      const text = document.getElementById('postContent').value;
-      const username = document.getElementById('username').value;
-      const avatarPath = document.getElementById('avatarUrl').value;
-      const postImagePath = document.getElementById('postImage').value;
-      const publication_date = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-  
-      const newPost = {
-        text,
-        username,
-        publication_date,
-        avatar_path: avatarPath || null,
-        post_image_path: postImagePath || null
-      };
-  
-      try {
-        const response = await fetch('http://localhost:3000/blogpost', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newPost),
-        });
-  
-        if (!response.ok) {
-          throw new Error(`An error occurred: ${response.statusText}`);
-        }
-  
-        // Refresh posts after successful creation
-        await fetchAndRenderPosts();
-  
-        // Clear the form
-        form.reset();
-      } catch (error) {
-        console.error('Error creating post:', error);
+  await fetchAndRenderPosts();
+
+  const form = document.getElementById('blogPostForm');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const text = document.getElementById('postContent').value;
+    const username = document.getElementById('username').value;
+    const avatarPath = document.getElementById('avatarUrl').value;
+    const postImageFile = document.getElementById('postImage').files[0];
+    const publication_date = new Date().toISOString().split('T')[0];
+
+    const formData = new FormData();
+    formData.append('text', text);
+    formData.append('username', username);
+    formData.append('publication_date', publication_date);
+    formData.append('avatar_path', avatarPath || null);
+    if (postImageFile) {
+      formData.append('post_image', postImageFile);
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/blogpost', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`An error occurred: ${response.statusText}`);
       }
-    });
+
+      await fetchAndRenderPosts();
+
+      form.reset();
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   });
+});
+
   
   // Function to fetch and render blog posts
   async function fetchAndRenderPosts() {

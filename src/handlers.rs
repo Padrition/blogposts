@@ -1,11 +1,13 @@
-use axum::response::{Html, IntoResponse};
+use axum::extract::Multipart;
 use axum::routing::get;
 use axum::{extract::State, http::StatusCode, routing::post, Json, Router};
+use chrono::NaiveDate;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use crate::schema::blogpost;
-
+use uuid::Uuid;
+use crate::schema::blogpost::{self};
 use crate::models::{BlogPost, NewBlogPost};
+use std::fs;
 
 pub fn blog_post_routers(pool: Pool) -> Router{
     Router::new()
@@ -16,8 +18,43 @@ pub fn blog_post_routers(pool: Pool) -> Router{
 
 async fn create_blog_post(
     State(pool) : State<deadpool_diesel::postgres::Pool>,
-    Json(new_blog_post): Json<NewBlogPost>,
+    mut multipart: Multipart
 ) -> Result<Json<BlogPost>, (StatusCode,String)> {
+    let mut new_blog_post = NewBlogPost{
+        text: String::new(),
+        publication_date: NaiveDate::from_ymd_opt(2000, 1, 1).unwrap(),
+        post_image_path: None,
+        username: String::new(),
+        avatar_path: None,
+    };
+
+    while let Some(field) = multipart.next_field().await.map_err(internal_error)? {
+        match field.name() {
+            Some("text") => {
+                new_blog_post.text = field.text().await.map_err(internal_error)?
+            },
+            Some("publication_date") => {
+                let date_str = field.text().await.map_err(internal_error)?;
+                new_blog_post.publication_date = NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
+                    .map_err(|err| (StatusCode::BAD_REQUEST, err.to_string()))?;
+            }
+            Some("username") => {
+                new_blog_post.username = field.text().await.map_err(internal_error)?;
+            },
+            Some("post_image") =>{
+                let file_name = format!("{}.png", Uuid::new_v4());
+                let file_path = format!("/media/{}", &file_name);
+
+                let data = field.bytes().await.map_err(internal_error)?;
+                fs::write(&file_path, &data).map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+
+                new_blog_post.post_image_path = Some(file_path);
+            },
+            _ => {}
+            
+        }
+    }
+
     let conn = pool.get().await.map_err(internal_error)?;
     let res = conn
         .interact(|conn|{
