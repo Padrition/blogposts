@@ -16,3 +16,5 @@ tower-http = { version = "0.6.1", features = ["cors", "fs"] }
 chrono = {version = "0.4.38", features = ["serde"]}
 dotenvy = "0.15.7"
 uuid = {version = "1.10.0", features = ["v4"]}
+reqwest = "0.12.9"
+imghdr = "0.7.0"

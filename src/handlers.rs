@@ -50,6 +50,28 @@ async fn create_blog_post(
 
                 new_blog_post.post_image_path = Some(file_path);
             },
+            Some("avatar_path") =>{
+                let url = field.text().await.map_err(internal_error)?;
+                
+                let response = reqwest::get(url)
+                .await
+                .map_err(internal_error)?;
+                
+                let data = response.bytes().await.map_err(internal_error)?;
+                
+                match imghdr::from_bytes(&data){
+                    Some(imghdr::Type::Png) => {
+                        let file_name = format!("avatar_{}.png", Uuid::new_v4());
+                        let file_path = format!("/media/{}", &file_name);
+
+                        fs::write(&file_path, &data).map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?;
+
+                        new_blog_post.avatar_path = Some(file_path);
+                    },
+                    _ => return Err((StatusCode::BAD_REQUEST, "Not an PNG".to_string())),
+                }
+
+            }
             _ => {}
             
         }
