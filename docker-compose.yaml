@@ -9,22 +9,38 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+    ports:
+      - "5432:5432"
 
   axum-app:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres/postgres
+    env_file:
+      - .env
+    volumes:
+      - media_data:/media
     depends_on:
       - postgres
     ports:
       - "3000:3000"
     networks:
       - app-network
+  
+  frontend:
+    image: nginx:alpine
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - media_data:/media
+    networks:
+      - app-network
+    ports:
+      - "80:80"
 
 volumes:
   pgdata:
+  media_data:
 
 networks:
   app-network:
